@@ -11,30 +11,36 @@ DATASET_DIR = "/home/bharadwajsirigadi/Documents/Data_preprocess/Datasets/MVP_Da
 TYPE = "Completion"
 SUB_TYPE = "Test"
 
-if (TYPE == 'completion' or TYPE == 'Completion') and (SUB_TYPE == 'test' or SUB_TYPE == 'Test'):
-    hdf5_file = 'MVP_Test_CP.h5'
-elif (TYPE == 'completion' or TYPE == 'Completion') and (SUB_TYPE == 'train'or SUB_TYPE == 'Train'):
-    hdf5_file = 'MVP_Train_CP.h5'
-elif (TYPE == 'registration' or TYPE == 'Registration') and (SUB_TYPE == 'test' or SUB_TYPE == 'Test'):
-    hdf5_file = 'MVP_Test_RG.h5'
-elif (TYPE == 'registration' or TYPE == 'Registration') and (SUB_TYPE == 'train' or SUB_TYPE == 'Train'):
-    hdf5_file = 'MVP_Train_RG.h5'
-else:
-    print("Invalid Type!")
-    exit()
-print(hdf5_file)
+class MVPDataset():
+    def __init__(self, data_dir: Path, type, sub_type) -> None:
+        self.dataset_dir = data_dir
+        self.file_path = self.get_file_path(data_dir, type, sub_type)
+        complete_pcds, incomplete_pcds, labels = self.load_data(self.file_path)
+        # point_cloud_o3d = o3d.geometry.PointCloud()
+        # point_cloud_o3d.points = o3d.utility.Vector3dVector(complete_pcds[0])
+        # o3d.visualization.draw_geometries([point_cloud_o3d])
 
-hdf5_file_path = os.path.join(DATASET_DIR, hdf5_file)
-
-
-# reading hdf5 file
-
-file = h5py.File(hdf5_file_path,'r+')
-print("Keys in the HDF5 file:", list(file.keys()))
-
-
-dataset = file[list(file.keys())[1]]
-print(dataset[0].shape)
-point_cloud_o3d = o3d.geometry.PointCloud()
-point_cloud_o3d.points = o3d.utility.Vector3dVector(dataset[100])
-o3d.visualization.draw_geometries([point_cloud_o3d])
+    def get_file_path(self, data_dir: Path, type, sub_type):
+        if (type == 'completion' or type == 'Completion') and (sub_type == 'test' or sub_type == 'Test'):
+            hdf5_file = 'MVP_Test_CP.h5'
+        elif (type == 'completion' or type == 'Completion') and (sub_type == 'train'or sub_type == 'Train'):
+            hdf5_file = 'MVP_Train_CP.h5'
+        elif (type == 'registration' or type == 'Registration') and (sub_type == 'test' or sub_type == 'Test'):
+            hdf5_file = 'MVP_Test_RG.h5'
+        elif (type == 'registration' or type == 'Registration') and (sub_type == 'train' or sub_type == 'Train'):
+            hdf5_file = 'MVP_Train_RG.h5'
+        else:
+            print("Invalid Type!")
+            exit()
+        hdf5_file_path = os.path.join(data_dir, hdf5_file)
+        return hdf5_file_path
+    
+    def load_data(self, file_path:Path):
+        file = h5py.File(file_path,'r+')
+        keys_list = list(file.keys())
+        complete_pcds = file[keys_list[0]][:]
+        incomplete_pcds = file[keys_list[1]][:]
+        labels = file[keys_list[2]][:]
+        return complete_pcds, incomplete_pcds, labels
+    
+a = MVPDataset(DATASET_DIR, TYPE, SUB_TYPE)
