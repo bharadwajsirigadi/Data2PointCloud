@@ -11,15 +11,13 @@ TYPE = "Completion"
 SUB_TYPE = "Test"
 
 # Default
+POINT_DATA_EXTENSION = ".npy"
 DIRECTORY = "point_cloud_data"
 
 class MVPDataset():
     def __init__(self, data_dir: Path, type, sub_type) -> None:
         self.dataset_dir = data_dir
         self.file_path = self.get_file_path(data_dir, type, sub_type)
-        # point_cloud_o3d = o3d.geometry.PointCloud()
-        # point_cloud_o3d.points = o3d.utility.Vector3dVector(complete_pcds[0])
-        # o3d.visualization.draw_geometries([point_cloud_o3d])
 
     def get_file_path(self, data_dir: Path, type, sub_type):
         if (type == 'completion' or type == 'Completion') and (sub_type == 'test' or sub_type == 'Test'):
@@ -57,25 +55,61 @@ class MVPDataset():
         complete_pcds = file[keys_list[0]][:]
         incomplete_pcds = file[keys_list[1]][:]
         labels = file[keys_list[2]][:]
-        # points = self.get_points(complete_pcds[0], incomplete_pcds[0])
-        # print(points.shape)
-        # point_cloud_o3d = o3d.geometry.PointCloud()
-        # point_positions = np.array(points[:, 3:], dtype=np.float64)
-        # point_cloud_o3d.points = o3d.utility.Vector3dVector(point_positions) 
-        # o3d.visualization.draw_geometries([point_cloud_o3d])
-        pc_length = len(complete_pcds)
+        self.pc_length = len(complete_pcds)
         counter = 0
         for i, j, k in zip(complete_pcds, incomplete_pcds, labels):
             points = self.get_points(i, j)
             file_name = f"frame-{counter:02d}-{k}.txt"
             self.save_numpy_array(points, file_name)
-            print(f"Generated point cloud for image {counter+1}/{pc_length}")
+            print(f"Generated point cloud for image {counter+1}/{self.pc_length}")
             counter += 1
         return
+    
+    def get_files(self, extension, dir:Path):
+        files = os.listdir(dir)
+        filtered_files = []
+        for file in files:
+            if file.startswith("frame-") and file.endswith(extension):
+                filtered_files.append(file)
+        filtered_files.sort()
+        return filtered_files
+
+    def __getitem__(self, idx):
+        data_path = os.path.join(self.dataset_dir, DIRECTORY)
+        if os.path.exists(data_path):
+            files = self.get_files(POINT_DATA_EXTENSION, data_path)
+            data_file_path = os.path.join(data_path, files[idx].strip())
+            data = np.load(data_file_path)
+        else:
+            print(f"Data isn't extracted yet!")
+            print(f"Extracting Data")
+            self.extract_data()
+            files = self.get_files(POINT_DATA_EXTENSION, data_path)
+            data_file_path = os.path.join(data_path, files[idx].strip())
+            data = np.load(data_file_path)
+        return data
+    
+    def __len__(self):
+        data_path = os.path.join(self.dataset_dir, DIRECTORY)
+        if os.path.exists(data_path):
+            files = self.get_files(POINT_DATA_EXTENSION, data_path)
+            files_length = len(files)
+        else:
+            print(f"Data isn't extracted yet!")
+            print(f"Extracting Data")
+            self.extract_data()
+            files = self.get_files(POINT_DATA_EXTENSION, data_path)
+            files_length = len(files)
+        return files_length
 
 def main():
     dataset = MVPDataset(DATASET_DIR, TYPE, SUB_TYPE)
-    dataset.extract_data()
+    # points = dataset[1]
+    print(f"Length of dataset: {len(dataset)}")
+    # point_cloud_o3d = o3d.geometry.PointCloud()
+    # point_positions = np.array(points[:, 3:], dtype=np.float64)
+    # point_cloud_o3d.points = o3d.utility.Vector3dVector(point_positions) 
+    # o3d.visualization.draw_geometries([point_cloud_o3d])
     return
 
 if __name__ == "__main__":
