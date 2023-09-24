@@ -4,8 +4,11 @@ import numpy as np
 from pathlib import Path
 import open3d as o3d
 
-DATASET_FOLDER_PATH = "/home/bharadwajsirigadi/Documents/Data_preprocess/sun3d-brown_bm_1-brown_bm_1" #"/home/bharadwajsirigadi/Documents/Data_preprocess/custom_dataset"
+# Specific to the requirement
+DATASET_FOLDER_PATH = "/home/bharadwajsirigadi/Documents/Data_preprocess/Datasets/3DMatch_Datasets/custom_dataset" #"/home/bharadwajsirigadi/Documents/Data_preprocess/custom_dataset"
 SEQUENCE = 1
+
+# Default
 RGB_EXTENSION = ".color.png"
 DEPTH_EXTENSION = ".depth.png"
 EXTRINSIC_EXTENSION = ".pose.txt"
@@ -21,7 +24,7 @@ class ThreeDMatchDataset2():
         self.dataset_dir = data_dir
         self.sequence_dir = os.path.join(data_dir, str(f"seq-{sequence:02d}"))
         self.intrinsic_matrix = np.loadtxt(os.path.join(self.dataset_dir, "camera-intrinsics.txt"))
-        self.load_data()
+        # self.extract_data()
 
     def get_files(self, extension, dir:Path):
         files = os.listdir(dir)
@@ -91,7 +94,7 @@ class ThreeDMatchDataset2():
             np.save(file_path, points, allow_pickle=True, fix_imports=True)
         return
     
-    def load_data(self):
+    def extract_data(self):
         RGB_img_files = self.get_files(RGB_EXTENSION, self.sequence_dir)
         self.write_text(RGB_img_files, "rgb_images")
         # print(f"Sorted & Retrieved RGB-Image Files")
@@ -117,7 +120,7 @@ class ThreeDMatchDataset2():
             point_cloud_o3d = o3d.geometry.PointCloud()
             point_positions = np.array(points[:, :, :3], dtype=np.float64).reshape(-1, 3)
             point_colors = np.array(points[:, :, 3:], dtype=np.uint8).reshape(-1, 3)
-            point_cloud_o3d.points = o3d.utility.Vector3dVector(point_positions)  # (X, Y, Z)
+            point_cloud_o3d.points = o3d.utility.Vector3dVector(point_positions) 
             point_cloud_o3d.colors = o3d.utility.Vector3dVector(point_colors/ 255.0)
             np.save("file", points, allow_pickle=True, fix_imports=True)
             file_name = str(f"frame-{counter:02d}")
@@ -133,24 +136,37 @@ class ThreeDMatchDataset2():
             files = self.get_files(POINT_DATA_EXTENSION, data_path)
             data_file_path = os.path.join(data_path, files[idx].strip())
             data = np.load(data_file_path)
+        else:
+            print(f"Data isn't extracted yet!")
+            print(f"Extracting Data")
+            self.extract_data()
+            files = self.get_files(POINT_DATA_EXTENSION, data_path)
+            data_file_path = os.path.join(data_path, files[idx].strip())
+            data = np.load(data_file_path)
         return data
     
     def __len__(self) -> int:
-        if self.data_loaded:
-            rgb_file_path = os.path.join(self.sequence_dir, "file_rgb_images.txt")
-            if os.path.exists(rgb_file_path):
-                rgb_file = open(rgb_file_path)
-                rgb_file_names = rgb_file.readlines()
-                return len(rgb_file_names)
-            else:
-                print(f"RGB file does not exist!")
+        rgb_file_path = os.path.join(self.sequence_dir, "file_rgb_images.txt")
+        if os.path.exists(rgb_file_path):
+            rgb_file = open(rgb_file_path)
+            rgb_file_names = rgb_file.readlines()
         else:
-            print(f"Load the data to generate point cloud first!")
+            print(f"Data isn't extracted yet!")
+            print(f"Extracting Data")
+            self.extract_data()
+            rgb_file = open(rgb_file_path)
+            rgb_file_names = rgb_file.readlines()
+        return len(rgb_file_names)
         
 def main():
     a = ThreeDMatchDataset2(DATASET_FOLDER_PATH, SEQUENCE)
-    print(f"Length of Dataset: {len(a)}")
-    print(f"Shape of Dataset: {a[0].shape}")
+    # points = a[2]
+    # point_cloud_o3d = o3d.geometry.PointCloud()
+    # point_positions = np.array(points[:, :, :3], dtype=np.float64).reshape(-1, 3)
+    # point_colors = np.array(points[:, :, 3:], dtype=np.uint8).reshape(-1, 3)
+    # point_cloud_o3d.points = o3d.utility.Vector3dVector(point_positions) 
+    # point_cloud_o3d.colors = o3d.utility.Vector3dVector(point_colors/ 255.0)
+    # o3d.visualization.draw_geometries([point_cloud_o3d])
     return
 
 if __name__ == "__main__":
