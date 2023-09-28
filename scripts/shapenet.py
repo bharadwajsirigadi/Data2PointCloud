@@ -73,22 +73,31 @@ class ShapeNetDataset():
             counter += 1
         return
     
-    # def __getitem__(self, idx):
-    #     data_path = os.path.join(self.dataset_dir, DIRECTORY)
-    #     print("Data Path", data_path)
-    #     if os.path.exists(data_path):
-    #         files = self.get_files(data_path, POINT_DATA_EXTENSION)
-    #         # print(files)
-    #         data_file_path = os.path.join(data_path, files[idx].strip())
-    #         data = np.load(data_file_path)
-    #     else:
-    #         print(f"Data isn't extracted yet!")
-    #         print(f"Extracting Data")
-    #         self.extract_data()
-    #         files = self.get_files(data_path, POINT_DATA_EXTENSION)
-    #         data_file_path = os.path.join(data_path, files[idx].strip())
-    #         data = np.load(data_file_path)
-    #     return data
+    def __getitem__(self, idx):
+        data_path = os.path.join(self.dataset_dir, DIRECTORY)
+        print("Data Path", data_path)
+        if os.path.exists(data_path):
+            files = os.listdir(data_path)
+            filtered_files = []
+            for file in files:
+                if file.startswith("frame-") and file.endswith(POINT_DATA_EXTENSION):
+                    filtered_files.append(file)
+            filtered_files.sort()
+            data_file_path = os.path.join(data_path, filtered_files[idx].strip())
+            data = np.load(data_file_path)
+        else:
+            print(f"Data isn't extracted yet!")
+            print(f"Extracting Data")
+            self.extract_data()
+            files = os.listdir(data_path)
+            filtered_files = []
+            for file in files:
+                if file.startswith("frame-") and file.endswith(POINT_DATA_EXTENSION):
+                    filtered_files.append(file)
+            filtered_files.sort()
+            data_file_path = os.path.join(data_path, filtered_files[idx].strip())
+            data = np.load(data_file_path)
+        return data
 
     def __len__(self) -> int:
         file_path = os.path.join(self.dataset_dir, DIRECTORY)
@@ -104,7 +113,7 @@ class ShapeNetDataset():
 c = ShapeNetDataset(DATASET_DIR)
 # c.extract_data()
 print(len(c))
-vertices = c[1]
+vertices = c[10]
 # filtered_files = get_files(DATASET_DIR)
 # write_text(filtered_files, "directories")
 
