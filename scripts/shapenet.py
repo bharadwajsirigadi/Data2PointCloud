@@ -3,7 +3,7 @@ import numpy as np
 from pathlib import Path
 import open3d as o3d
 
-DATASET_DIR = "/home/bharadwajsirigadi/Documents/Data_preprocess/Datasets/ShapeNet_Datasets/02691156"
+DATASET_DIR = "/home/bharadwajsirigadi/Documents/Data_preprocess/Datasets/ShapeNet_Datasets/custom_dataset"
 
 DIRECTORY = "point_cloud_data"
 POINT_DATA_EXTENSION = ".npy"
@@ -28,10 +28,23 @@ class ShapeNetDataset():
 
     def get_files(self, dir:Path, extension):
         files = os.listdir(dir)
+        f_files = []
+        for folder_name in files:
+            if folder_name != "point_cloud_data" and not folder_name.endswith('.txt'):
+                f_files.append(folder_name)
         filtered_files = []
-        for file in files:
+        for file in f_files:
             path = os.path.join(dir, file, extension)
             filtered_files.append(path)
+        return filtered_files
+    
+    def get_pc_files(self, dir:Path, extension):
+        files = os.listdir(dir)
+        filtered_files = []
+        for file in files:
+            if file.startswith("frame-") and file.endswith(extension):
+                filtered_files.append(file)
+        filtered_files.sort()
         return filtered_files
 
     def write_text(self, dir:Path, files_list, file_name):
@@ -77,24 +90,14 @@ class ShapeNetDataset():
         data_path = os.path.join(self.dataset_dir, DIRECTORY)
         print("Data Path", data_path)
         if os.path.exists(data_path):
-            files = os.listdir(data_path)
-            filtered_files = []
-            for file in files:
-                if file.startswith("frame-") and file.endswith(POINT_DATA_EXTENSION):
-                    filtered_files.append(file)
-            filtered_files.sort()
+            filtered_files = self.get_pc_files(data_path, POINT_DATA_EXTENSION)
             data_file_path = os.path.join(data_path, filtered_files[idx].strip())
             data = np.load(data_file_path)
         else:
             print(f"Data isn't extracted yet!")
             print(f"Extracting Data")
             self.extract_data()
-            files = os.listdir(data_path)
-            filtered_files = []
-            for file in files:
-                if file.startswith("frame-") and file.endswith(POINT_DATA_EXTENSION):
-                    filtered_files.append(file)
-            filtered_files.sort()
+            filtered_files = self.get_pc_files(data_path, POINT_DATA_EXTENSION)
             data_file_path = os.path.join(data_path, filtered_files[idx].strip())
             data = np.load(data_file_path)
         return data
@@ -113,12 +116,10 @@ class ShapeNetDataset():
 c = ShapeNetDataset(DATASET_DIR)
 # c.extract_data()
 print(len(c))
-vertices = c[10]
+# vertices = c[1]
 # filtered_files = get_files(DATASET_DIR)
 # write_text(filtered_files, "directories")
-
 # print(files)
-point_cloud_o3d = o3d.geometry.PointCloud()
-point_cloud_o3d.points = o3d.utility.Vector3dVector(vertices) 
-o3d.visualization.draw_geometries([point_cloud_o3d])
-print(vertices)
+# point_cloud_o3d = o3d.geometry.PointCloud()
+# point_cloud_o3d.points = o3d.utility.Vector3dVector(vertices) 
+# o3d.visualization.draw_geometries([point_cloud_o3d])
