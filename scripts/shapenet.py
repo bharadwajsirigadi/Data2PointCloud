@@ -6,7 +6,8 @@ import open3d as o3d
 DATASET_DIR = "/home/bharadwajsirigadi/Documents/Data_preprocess/Datasets/ShapeNet_Datasets/02691156"
 
 DIRECTORY = "point_cloud_data"
-FILE_NAME = str()
+POINT_DATA_EXTENSION = ".npy"
+OBJ_EXTENSION = "models/model_normalized.obj"
 
 class ShapeNetDataset():
     def __init__(self, data_dir:Path, *_, **__) -> None:
@@ -25,11 +26,11 @@ class ShapeNetDataset():
                 vertices.append([x, y, z])
         return vertices
 
-    def get_files(self, dir:Path):
+    def get_files(self, dir:Path, extension):
         files = os.listdir(dir)
         filtered_files = []
         for file in files:
-            path = os.path.join(dir, file, "models/model_normalized.obj")
+            path = os.path.join(dir, file, extension)
             filtered_files.append(path)
         return filtered_files
 
@@ -58,7 +59,7 @@ class ShapeNetDataset():
         return
     
     def extract_data(self):
-        file_dirs = self.get_files(DATASET_DIR)
+        file_dirs = self.get_files(DATASET_DIR, OBJ_EXTENSION)
         self.write_text(DATASET_DIR, file_dirs, "directories")
         directories_file = open(os.path.join(DATASET_DIR, self.file_name))
         directories = directories_file.readlines()
@@ -71,15 +72,44 @@ class ShapeNetDataset():
             print(f"Generated point cloud for image {counter+1}/{len(directories)}")
             counter += 1
         return
+    
+    # def __getitem__(self, idx):
+    #     data_path = os.path.join(self.dataset_dir, DIRECTORY)
+    #     print("Data Path", data_path)
+    #     if os.path.exists(data_path):
+    #         files = self.get_files(data_path, POINT_DATA_EXTENSION)
+    #         # print(files)
+    #         data_file_path = os.path.join(data_path, files[idx].strip())
+    #         data = np.load(data_file_path)
+    #     else:
+    #         print(f"Data isn't extracted yet!")
+    #         print(f"Extracting Data")
+    #         self.extract_data()
+    #         files = self.get_files(data_path, POINT_DATA_EXTENSION)
+    #         data_file_path = os.path.join(data_path, files[idx].strip())
+    #         data = np.load(data_file_path)
+    #     return data
+
+    def __len__(self) -> int:
+        file_path = os.path.join(self.dataset_dir, DIRECTORY)
+        if os.path.exists(file_path):
+            file_names = os.listdir()
+        else:
+            print(f"Data isn't extracted yet!")
+            print(f"Extracting Data")
+            self.extract_data()
+            file_names = os.listdir()
+        return len(file_names)
             
 c = ShapeNetDataset(DATASET_DIR)
-c.extract_data()
-
+# c.extract_data()
+print(len(c))
+vertices = c[1]
 # filtered_files = get_files(DATASET_DIR)
 # write_text(filtered_files, "directories")
 
 # print(files)
-# point_cloud_o3d = o3d.geometry.PointCloud()
-# point_cloud_o3d.points = o3d.utility.Vector3dVector(vertices) 
-# o3d.visualization.draw_geometries([point_cloud_o3d])
-# print(vertices)
+point_cloud_o3d = o3d.geometry.PointCloud()
+point_cloud_o3d.points = o3d.utility.Vector3dVector(vertices) 
+o3d.visualization.draw_geometries([point_cloud_o3d])
+print(vertices)
