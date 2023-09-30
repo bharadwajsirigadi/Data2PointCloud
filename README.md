@@ -5,7 +5,7 @@
 2. MVP
 3. ShapeNet
 
-[Folder Structure of Datasets](https://github.com/bharadwajsirigadi/Data2PointCloud/wiki#folder-structure)
+[Datasets Folder Structure](https://github.com/bharadwajsirigadi/Data2PointCloud/wiki#folder-structure)
 
 ## Authors
 <a href="https://github.com/bharadwajsirigadi/Data2PointCloud/graphs/contributors">
