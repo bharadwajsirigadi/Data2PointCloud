@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[dependencies]
+open3d = "0.17.0"
+opencv = "4.8.0"
+
+[project]
+name = "Data2PointCloud_bharadwajsirigadi"
+version = "0.0.1"
+authors = [
+  { name="Sai Bharadwaj Sirigadi", email="bharadwajsirigadi@gmail.com" },
+]
+description = "A package to preprocess the dataset to .npy files."
+readme = "README.md"
+requires-python = "=3.9.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/bharadwajsirigadi/Data2PointCloud.git"
+"Bug Tracker" = "https://github.com/bharadwajsirigadi/Data2PointCloud/issues"
