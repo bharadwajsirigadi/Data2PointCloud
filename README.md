@@ -16,6 +16,11 @@
 ```
 pip3 install Data2PointCloud
 ```
+If you also want to install all the *(optional)* dependencies, like Open3D for running the visualizer:
+
+```
+pip install "Data2PointCloud[all]"
+```
 
 ### Authors
 <a href="https://github.com/bharadwajsirigadi/Data2PointCloud/graphs/contributors">
