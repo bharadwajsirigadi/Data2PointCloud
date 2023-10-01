@@ -23,8 +23,6 @@ pip install "Data2PointCloud[all]"
 ```
 
 ### Authors
-<a href="https://github.com/bharadwajsirigadi/Data2PointCloud/graphs/contributors">
-  Sai Bharadwaj Sirigadi
-</a>
+* [Sai Bharadwaj Sirigadi](https://github.com/bharadwajsirigadi/Data2PointCloud/graphs/contributors)
 
 
