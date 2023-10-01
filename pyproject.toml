@@ -7,7 +7,7 @@ open3d = "0.17.0"
 opencv = "4.8.0"
 
 [project]
-name = "Data2PointCloud_bharadwajsirigadi"
+name = "Data2PointCloud"
 version = "0.0.1"
 authors = [
   { name="Sai Bharadwaj Sirigadi", email="bharadwajsirigadi@gmail.com" },
