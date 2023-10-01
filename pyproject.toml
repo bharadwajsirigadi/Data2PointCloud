@@ -15,6 +15,15 @@ authors = [
 description = "A package to preprocess the dataset to .npy files."
 readme = "README.md"
 requires-python = "=3.9.11"
+
+[project.optional-dependencies]
+all = [
+    "open3d>=0.17.0",
+    "opencv>=4.8.0"
+]
+visualizer = [
+    "open3d>=0.13",
+]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
