@@ -21,6 +21,15 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+[project.optional-dependencies]
+all = [
+    "open3d>=0.13",
+    "opencv>=4.8.0",
+]
+visualizer = [
+    "open3d>=0.13",
+]
+
 [project.urls]
 "Homepage" = "https://github.com/bharadwajsirigadi/Data2PointCloud.git"
 "Bug Tracker" = "https://github.com/bharadwajsirigadi/Data2PointCloud/issues"
